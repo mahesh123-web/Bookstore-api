@@ -1,0 +1,16 @@
+@"
+# Virtual Environments
+venv/
+.venv/
+
+# Cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+"@ | Out-File -FilePath .gitignore -Encoding utf8
