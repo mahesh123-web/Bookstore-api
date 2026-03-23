@@ -24,7 +24,7 @@ class BookstoreServicer(bookstore_pb2_grpc.BookstoreServiceServicer):
         books = [bookstore_pb2.BookResponse(**b) for b in books_data.values()]
         return bookstore_pb2.BookListResponse(books=books)
     
-    def SearchBooks(self, request, coontext):
+    def SearchBooks(self, request, context):
         genre = request.genre.lower()
         max_price = request.max_price
         
@@ -33,7 +33,7 @@ class BookstoreServicer(bookstore_pb2_grpc.BookstoreServiceServicer):
         for book in books_data.values():
             if genre and book["genre"].lower() != genre:
                 continue
-            if max_price and book["price"] > max_price:
+            if max_price > 0 and book["price"] > max_price:
                 continue
             filtered_books.append(bookstore_pb2.BookResponse(**book))
         return bookstore_pb2.BookListResponse(books = filtered_books)
