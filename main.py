@@ -2,6 +2,8 @@ from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
+from graphql_api import schema as graphql_schema
+
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends
 from auth import(
@@ -184,3 +186,4 @@ def search_books(title:Optional[str]=None, max_price: Optional[float]=None):
     return results
     
     
+app.include_router(graphql_schema, prefix="/graphql")
