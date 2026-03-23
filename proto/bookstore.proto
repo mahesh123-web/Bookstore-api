@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+message BookRequest{
+    int32 book_id = 1;
+}
+
+message BookResponse{
+    int32 id = 1;
+    string title = 2;
+    float price = 3;
+    string genre = 4;
+}
+
+message BookListResponse{
+    repeated BookResponse books = 1;
+}
+
+message SearchRequest {
+  string genre  = 1;
+  float  max_price = 2;
+}
+
+message Empty{}
+
+service BookstoreService{
+    rpc GetBook (BookRequest) returns(BookResponse);
+    rpc ListBooks(Empty) returns(BookListResponse);
+    rpc SearchBooks(SearchRequest) returns(BookListResponse);
+}
+
