@@ -1,6 +1,7 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 from typing import Optional
+import pika, json
 
 from graphql_api import schema as graphql_schema
 
@@ -105,6 +106,7 @@ def create_book(book:Book, current_user: dict = Depends(get_current_user)):
     new_book = {"id":book_counter,**book.dict()}
     books_db[book_counter] = new_book
     book_counter+=1
+    publish_book_event("book.created",new_book)
     return new_book
 
 @app.get("/books/{book_id}")
@@ -184,6 +186,25 @@ def search_books(title:Optional[str]=None, max_price: Optional[float]=None):
         results.append(book)
         
     return results
+
+
+def publish_book_event(event_type: str, book_data: dict):
+    try:
+        credentials = pika.PlainCredentials("admin", "admin")
+
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host = "localhost", credentials=credentials)
+        )
+        channel = connection.channel()
+        channel.exchange_declare(exchange="book_events", exchange_type="fanout")
+        channel.basic_publish(
+            exchange="book_events",
+            routing_key="",
+            body=json.dumps({"event":event_type, "data":book_data})
+        )
+        connection.close()
+    except Exception as e:
+        print(f"[Warning] Could not publish event: {e}")
     
     
 app.include_router(graphql_schema, prefix="/graphql")
